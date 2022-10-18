@@ -1,84 +1,55 @@
+# behave-rest
+
 BDD-style Rest API testing tool
 
-It uses python's `requests <https://pypi.python.org/pypi/requests/>`_ for performing HTTP requests, `nose <https://pypi.python.org/pypi/nose/1.3.7>`_ for most assertions, `trafaret <https://github.com/Deepwalker/trafaret>`_ for json validation and `behave <https://pypi.python.org/pypi/behave/1.2.5>`_ for BDD style of tests.
+It uses python's [requests](https://pypi.python.org/pypi/requests/) for performing HTTP requests, [nose](https://pypi.python.org/pypi/nose/1.3.7) for most assertions, [trafaret](https://github.com/Deepwalker/trafaret) for json validation and [behave](https://pypi.python.org/pypi/behave/1.2.5) for BDD style of tests.
 
-Installation
-------------
-Clone `project <https://github.com/stanfy/behave-rest>`_
-
-Run 
-::
-
-  pip install -r requirements.txt # install required dependencies
+## Installation
+Run `pip install behave_rest` to download package and install required dependencies
 
 OR
 
-Run 
-::
-  
-  pip install behave_rest
+Clone project
 
-Running
--------
+Run `pip install -r requirements.txt` to install required dependencies
 
-::
+## Running
 
-    # to execute all feature files (all tests)
-    behave
-    
-    # to execture specific feature
-    behave features/twitter.feature
-    
-    # to see printed output add --no-capture
-    behave --no-capture
-    
-    # run features with specific tags
-    behave --tags=without_login --tags=slow
+```bash
+# to execute all feature files (all tests)
+behave
 
+# to execture specific feature
+behave features/restapitest.feature
 
+# to see printed output add --no-capture
+behave --no-capture
+
+# run features with specific tags
+behave --tags=restapiexample --tags=slow
+
+```
 More about behave tool you can read here https://pythonhosted.org/behave/index.html
 
-Test example
-------------
-::
-
-    Feature: Twitter search
-    
-      Background: Setup environment
-        Given I set base URL to "https://api.twitter.com/1.1/search"
-        And I set "Authorization" header to "context.twitter_auth"
-      
-      Scenario: Search for tweets
-        When I make a GET request to "tweets.json" with parameters
-        |q|
-        |stanfy|
-        Then the response status code should equal 200
-        And the response structure should equal "twitterSearchData"
-        And the response header "status" should equal "200 OK"
-
-
-You can get test feature files from the `project repo <https://github.com/stanfy/behave-rest>`_
-
-CI reports
-----------
+## CI reports
 Behave support JUnit reports, that are easily parsed by CI tools
 
-To enable JUnit reports, create `behave.ini` file:
-::
+To enable HTML reports, create `behave.ini` file:
+```
+[behave.formatters]
+html = behave_html_formatter:HTMLFormatter
+```
 
-  [behave]
-  junit=true
+```bash
+# To run test with report 
+behave -f html -o behave-report.html
+```
 
-Reports are generated into `/reports` folder
+## SSL validation
 
-Another useful options to add into `behave.ini` are:
+By default, `requests` has a turned on SSL validation. This can be turned off globally, by setting `context.verify_ssl = True` in `environment.py`, or by using steps described in [Wiki page](https://github.com/stanfy/behave-rest/wiki#steps-related-to-ssl-validation) 
 
-`stdout_capture=False` to add printed output into reports
-
-`show_timings=no` to hide timing of each step
-
-Project Structure
------------------
+## Project Structure
 
 Feature files are intended to locate in `/features` folder
 
@@ -86,20 +57,31 @@ Corresponding steps are located in `/features/steps`
 
 Overall project structure is as follows:
 
-::
+```
++-- requirements.txt // store python requirements
+
++-- behave_rest/
     
-    +-- features/
-    
-        +-- conf.yaml // store project config (urls, global variables, etc.)
-    
-        +-- environment.py // context setup steps (e.g. load from config)
-    
-        +-- *.feature // feature files
-    
-        +-- steps/
-    
-            +-- __init__.py // used to import predefined steps
-    
-            +-- json_responses.py // response structures described in Trafaret format
-    
-            +-- *.py // steps related to corresponding feature (e.g. "login.py" contains steps that are related to "login.feature")
+    +-- environment.py // contains common actions related to scenarios (e.g. clearting headers after running each feature file)
+
+    +-- steps/
+
+        +-- __init__.py // contains common steps definitions
+
++-- features/
+
+    +-- conf.yaml // store project config (urls, global variables, etc.)
+
+    +-- environment.py // context setup steps (e.g. load from config)
+
+    +-- *.feature // feature files
+
+    +-- steps/
+
+        +-- __init__.py // used to import predefined steps
+
+        +-- json_responses.py // response structures described in Trafaret format
+
+        +-- *.py // steps related to corresponding feature (e.g. "login.py" contains steps that are related to "login.feature")  
+        
+```
